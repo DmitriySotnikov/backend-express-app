@@ -1,0 +1,72 @@
+{
+  "name": "test-project-v2",
+  "version": "1.0.0",
+  "description": "Test project for Express, JWT, Joi, Webpack",
+  "main": "index.js",
+  "scripts": {
+    "format": "prettier --write \"src/**/*.ts\"",
+
+    "typeorm": "ts-node ./node_modules/typeorm/cli.js",
+    "typeorm:migration:create": "typeorm migration:create",
+    "typeorm:migration:generate": "npm run typeorm -- -d ./migration.conf.ts migration:generate",
+    "typeorm:migration:run": "npm run typeorm -- -d ./migration.conf.ts migration:run",
+    "typeorm:migration:revert": "npm run typeorm -- -d ./migration.conf.ts migration:revert",
+
+    "gen:swagger-spec": "ts-node --project ./tsconfig.scripts.json ./scripts/generate-swagger-spec.ts",
+    "gen:api-types": "swagger-typescript-api generate -p ./swagger-spec.json -o ./src/infrastructure/types -n dto.types.ts --no-client",
+    
+    "dev": "npm run gen:swagger-spec && npm run gen:api-types && ts-node-dev --respawn src/app.ts",
+
+    "build:tsc": "tsc --project tsconfig.json",
+    "start:tsc": "set NODE_ENV=production && node dist_tsc/app.js",
+
+    "build:webpack": "webpack",
+    "start:webpack": "node dist/prod_webpack/server.js"
+  },
+  "keywords": [
+    "express",
+    "jwt",
+    "typescript"
+  ],
+  "author": "Dmitry Sotnikov",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "http-status": "^2.1.0",
+    "joi": "^18.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.16.3",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "typeorm": "^0.3.20",
+    "winston": "^3.8.2",
+    "yamljs": "^0.3.0"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/cookie-parser": "^1.4.9",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/joi": "^17.2.2",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
+    "@types/yamljs": "^0.2.34",
+    "babel-loader": "^10.0.0",
+    "cross-env": "^10.0.0",
+    "nodemon": "^3.1.10",
+    "prettier": "^3.0.0",
+    "swagger-typescript-api": "^13.2.8",
+    "ts-loader": "^9.5.2",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.2",
+    "webpack": "^5.101.2",
+    "webpack-cli": "^6.0.1",
+    "webpack-node-externals": "^3.0.0"
+  }
+}

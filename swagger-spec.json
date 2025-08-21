@@ -1,0 +1,645 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Express test project API",
+    "version": "1.0.0",
+    "description": "API documentation for the project, providing endpoints for authentication, user management, etc."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000/api",
+      "description": "Express test server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "SignInDto": {
+        "type": "object",
+        "required": [
+          "email",
+          "password",
+          "deviceId"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "admin@example.com"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "example": "strongpassword123"
+          },
+          "deviceId": {
+            "type": "string",
+            "example": "unique-device-id-abcde"
+          }
+        }
+      },
+      "SignUpDto": {
+        "type": "object",
+        "required": [
+          "firstname",
+          "lastname",
+          "surname",
+          "birthDate",
+          "email",
+          "password",
+          "deviceId",
+          "roleNames"
+        ],
+        "properties": {
+          "firstname": {
+            "type": "string",
+            "example": "John"
+          },
+          "lastname": {
+            "type": "string",
+            "example": "Doe"
+          },
+          "surname": {
+            "type": "string",
+            "example": "Smith"
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date",
+            "example": "1990-01-01"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "user@example.com"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "example": "strongpassword123"
+          },
+          "deviceId": {
+            "type": "string",
+            "example": "unique-device-identifier-12345"
+          },
+          "roleNames": {
+            "type": "array",
+            "description": "Roles to be assigned to the user. Must be from the allowed list.",
+            "items": {
+              "type": "string",
+              "enum": [
+                "USER",
+                "ADMIN"
+              ]
+            },
+            "example": [
+              "USER"
+            ]
+          }
+        }
+      },
+      "SuccessAuthResponseDto": {
+        "type": "object",
+        "required": [
+          "accessToken",
+          "refreshToken"
+        ],
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "description": "A short-lived JSON Web Token for accessing protected resources.",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "A long-lived token stored in an HTTP-only cookie, used to obtain a new access token.",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          }
+        }
+      },
+      "LogoutResponseDto": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Successfully logged out"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "integer",
+            "example": 500
+          },
+          "message": {
+            "type": "string",
+            "example": "Internal Server Error"
+          }
+        }
+      },
+      "SuccessMessageResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Operation completed successfully"
+          }
+        }
+      },
+      "UserRoleResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "ADMIN"
+          }
+        }
+      },
+      "UserResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 123
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "user@example.com"
+          },
+          "firstname": {
+            "type": "string",
+            "example": "John"
+          },
+          "lastname": {
+            "type": "string",
+            "example": "Doe"
+          },
+          "surname": {
+            "type": "string",
+            "example": "Smith"
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date",
+            "example": "1990-01-01"
+          },
+          "isBanned": {
+            "type": "boolean",
+            "example": false
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserRoleResponse"
+            }
+          }
+        }
+      },
+      "UserListResponseDto": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/UserResponseDto"
+        }
+      }
+    },
+    "responses": {
+      "Unauthorized": {
+        "description": "Authentication required. The JWT is missing, invalid, or expired.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "example": 401
+                    },
+                    "message": {
+                      "example": "Authentication required: No token provided or token format is invalid."
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Forbidden. The authenticated user does not have sufficient permissions.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "example": 403
+                    },
+                    "message": {
+                      "example": "Access denied: Insufficient permissions."
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Not Found. The requested resource could not be found.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "example": 404
+                    },
+                    "message": {
+                      "example": "The requested resource could not be found."
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "Bad Request. The request was malformed or invalid.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "example": 400
+                    },
+                    "message": {
+                      "example": "Bad Request: Invalid input data."
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "Internal Server Error. An unexpected error occurred on the server.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "example": 500
+                    },
+                    "message": {
+                      "example": "Internal Server Error."
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/auth/signin": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "User Sign In",
+        "description": "Authenticate a user and generate access tokens.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignInDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful authentication.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessAuthResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication failed."
+          }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Refresh Access Token",
+        "description": "Generate a new access token using a refresh token.",
+        "responses": {
+          "200": {
+            "description": "Token successfully refreshed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessAuthResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/auth/signup": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Register a new user",
+        "description": "Creates a new user account and returns a pair of access and refresh tokens.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignUpDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful registration. Returns tokens.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessAuthResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": []
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Logout user",
+        "description": "Invalidates the user's session by deleting the refresh token. Requires authentication.",
+        "responses": {
+          "200": {
+            "description": "Successfully logged out.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogoutResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get user information by ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "The ID of the user to retrieve."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK. The user data was successfully retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get a list of all users",
+        "description": "Retrieves a list of all users. Requires ADMIN role.",
+        "responses": {
+          "200": {
+            "description": "OK. A list of users was successfully retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserListResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
+    },
+    "/users/{id}/ban": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Ban User by ID",
+        "description": "Ban a user by their ID. Requires authentication.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true,
+            "description": "Numeric ID of the user to ban."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User successfully banned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/users/{id}/unban": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Unban User by ID",
+        "description": "Unban a user by their ID. Requires authentication and Admin role.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "required": true,
+            "description": "Numeric ID of the user to unban."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User successfully unbanned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    }
+  },
+  "tags": []
+}
