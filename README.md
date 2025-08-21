@@ -42,8 +42,8 @@ This project is a robust and scalable boilerplate for building API servers using
 ### 1. Clone the Repository
 
 ```bash
-git clone <your-repository-url>
-cd <project-folder-name>
+git clone https://github.com/DmitriySotnikov/backend-express-app.git
+cd backend-express-app
 ```
 
 ### 2. Install Dependencies
