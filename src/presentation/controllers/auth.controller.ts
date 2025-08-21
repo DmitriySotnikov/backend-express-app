@@ -1,6 +1,6 @@
 import httpStatus from 'http-status';
-import { authConfig } from '../../config';
 import { Request, Response } from 'express';
+import { configService } from '../../config/config.service';
 import { container } from '../../infrastructure/di/container';
 import { SignUpDto } from '../../infrastructure/types/dto.types';
 import { ApiError } from '../../infrastructure/utils/common.utils';
@@ -83,7 +83,7 @@ export default class AuthUserController {
    * @throws {ApiError} If token refresh fails or no token is present
    */
   public refreshToken = async (req: Request, res: Response) => {
-    const token = req.cookies[authConfig.COOKIE_TOKEN];
+    const token = req.cookies[configService.get('COOKIE_TOKEN')];
     if (!token) {
       throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid token!');
     }
@@ -108,7 +108,7 @@ export default class AuthUserController {
    * @throws {ApiError} If registration fails
    */
   public signup = async (req: Request, res: Response) => {
-    const signupData = req.body as SignUpDto ;
+    const signupData = req.body as SignUpDto;
 
     const { accessToken, refreshToken } =
       await this.authService.signupUser(signupData);
@@ -133,11 +133,11 @@ export default class AuthUserController {
    * @throws {ApiError} If logout fails or no token is present
    */
   public logout = async (req: Request, res: Response) => {
-    const token = req.cookies[authConfig.COOKIE_TOKEN];
+    const token = req.cookies[configService.get('COOKIE_TOKEN')];
     if (!token) {
       throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid token!');
     }
-    res.clearCookie(authConfig.COOKIE_TOKEN, { httpOnly: true });
+    res.clearCookie(configService.get('COOKIE_TOKEN'), { httpOnly: true });
     const result = await this.authService.logoutUser({ token });
     res.status(httpStatus.OK).json(result);
   };

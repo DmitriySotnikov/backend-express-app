@@ -1,4 +1,4 @@
-import { config } from '../../config';
+import { configService } from '../../config/config.service';
 
 /**
  * Predefined User Roles
@@ -23,6 +23,7 @@ export const ADMIN = 'ADMIN';
  */
 export const PRODUCTION = 'production';
 export const DEVELOPMENT = 'development';
+export const TEST = 'test';
 
 /**
  * Allowed User Roles
@@ -85,9 +86,7 @@ export const loggerLevels = {
  * @returns {string} The log level ('debug' for development, 'warn' for production)
  */
 export const loggerLevel = () => {
-  const env = config.NODE_ENV || DEVELOPMENT;
-  const isDevelopment = env === DEVELOPMENT;
-  return isDevelopment ? 'debug' : 'warn';
+  return configService.isDevelopment ? 'debug' : 'warn';
 };
 
 /**

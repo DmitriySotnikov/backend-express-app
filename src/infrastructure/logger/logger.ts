@@ -16,7 +16,6 @@
  * @requires config
  */
 import winston from 'winston';
-import { config } from '../../config';
 import {
   DEBUG_LEVEL,
   ERROR_LEVEL,
@@ -27,6 +26,7 @@ import {
   PRODUCTION,
   winstonTransportsFileNames,
 } from '../../infrastructure/constants';
+import { configService } from '../../config/config.service';
 
 // Apply custom colors to winston logger for enhanced console readability
 winston.addColors(loggerColors);
@@ -84,7 +84,7 @@ const transports: winston.transport[] = [
 ];
 
 // Add file transports in production environment
-if (config.NODE_ENV === PRODUCTION) {
+if (configService.get('NODE_ENV') === PRODUCTION) {
   transports.push(
     // Dedicated file for error logs
     new winston.transports.File({

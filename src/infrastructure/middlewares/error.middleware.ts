@@ -1,9 +1,8 @@
 import httpStatus from 'http-status';
-import { config } from '../../config';
 import { ApiError } from '../utils/common.utils';
 import logger from '../../infrastructure/logger/logger';
 import { Request, Response, NextFunction } from 'express';
-import { DEVELOPMENT } from '../../infrastructure/constants';
+import { configService } from '../../config/config.service';
 
 /**
  * @function errorHandler
@@ -83,7 +82,7 @@ export const errorHandler = (
   }
 
   // Include stack trace only in development mode for debugging
-  if (config.NODE_ENV === DEVELOPMENT) {
+  if (configService.isDevelopment) {
     (response as any).stack = error.stack;
   }
 

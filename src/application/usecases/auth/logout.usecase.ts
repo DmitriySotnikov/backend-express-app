@@ -1,5 +1,5 @@
 import httpStatus from 'http-status';
-import { authConfig } from '../../../config';
+import { configService } from '../../../config/config.service';
 import { JwtService } from '../../../infrastructure/jwt/jwt.service';
 import { ApiError } from '../../../infrastructure/utils/common.utils';
 import { UserDomainRepository } from '../../../domain/repositories/user.repository';
@@ -65,7 +65,7 @@ export class LogoutUsecase {
     // Verify the token, throw unauthorized error if invalid
     const payload = this.jwtService.verifyJWT({
       token,
-      secret: authConfig.JWT_SECRET,
+      secret: configService.get('JWT_SECRET'),
     });
 
     if (!payload) {

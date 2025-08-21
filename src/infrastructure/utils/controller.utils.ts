@@ -1,8 +1,8 @@
 import { Response } from 'express';
 import httpStatus from 'http-status';
 import { ApiError } from './common.utils';
-import { authConfig } from '../../config';
 import { Role } from '../../domain/entities/role.entity';
+import { configService } from '../../config/config.service';
 import { IAuthRequest } from '../../infrastructure/types/request.types';
 
 /**
@@ -27,11 +27,11 @@ import { IAuthRequest } from '../../infrastructure/types/request.types';
  * });
  */
 export const setCookie = ({ res, token }: { res: Response; token: string }) => {
-  res.cookie(authConfig.COOKIE_TOKEN, token, {
+  res.cookie(configService.get('COOKIE_TOKEN'), token, {
     httpOnly: true,
     secure: true,
     sameSite: 'none',
-    maxAge: Number(authConfig.COOKIE_EXPIRES_IN), // 604800000, // 7 days
+    maxAge: configService.get('COOKIE_EXPIRES_IN'), // 604800000, // 7 days
   });
 };
 

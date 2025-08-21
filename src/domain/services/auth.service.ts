@@ -1,6 +1,6 @@
-import { authConfig } from '../../config';
 import { User } from '../entities/user.entity';
 import { Session } from '../entities/session.entity';
+import { configService } from '../../config/config.service';
 import { JwtService } from '../../infrastructure/jwt/jwt.service';
 import { rolesToString } from '../../infrastructure/utils/controller.utils';
 import { SessionDomainRepository } from '../repositories/session.repositiry';
@@ -48,14 +48,14 @@ export class AuthDomainService {
       userId,
       roles: rolesStr,
       deviceId,
-      time: authConfig.REFRESH_TOKEN_EXPIRES_IN,
+      time: configService.get('REFRESH_TOKEN_EXPIRES_IN'),
     });
 
     const accessToken = this.jwtService.createToken({
       userId,
       roles: rolesStr,
       deviceId,
-      time: authConfig.ACCESS_TOKEN_EXPIRES_IN,
+      time: configService.get('ACCESS_TOKEN_EXPIRES_IN'),
     });
 
     return { accessToken, refreshToken };

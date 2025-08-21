@@ -1,7 +1,7 @@
 import httpStatus from 'http-status';
-import { authConfig } from '../../config';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import { ApiError } from '../utils/common.utils';
+import { configService } from '../../config/config.service';
 import { JwtDomainService } from '../../domain/services/jwt.service';
 
 /**
@@ -52,7 +52,7 @@ export class JwtService implements JwtDomainService {
           deviceId,
           roles,
         },
-        authConfig.JWT_SECRET!,
+        configService.get('JWT_SECRET'),
         {
           expiresIn: time,
         } as SignOptions,

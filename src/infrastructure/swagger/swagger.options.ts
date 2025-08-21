@@ -1,5 +1,5 @@
-import { config } from '../../config';
 import { SwaggerOptions } from 'swagger-ui-express';
+import { configService } from '../../config/config.service';
 
 /**
  * Swagger configuration for API documentation.
@@ -27,7 +27,7 @@ export const swaggerOptions: SwaggerOptions = {
     },
     servers: [
       {
-        url: config.OPEN_API_URL,
+        url: configService.get('OPEN_API_URL'),
         description: 'Express test server',
       },
     ],

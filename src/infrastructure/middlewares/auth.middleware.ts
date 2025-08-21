@@ -1,9 +1,9 @@
 import httpStatus from 'http-status';
-import { authConfig } from '../../config';
 import { container } from '../di/container';
 import { ApiError } from '../utils/common.utils';
 import { JwtService } from '../jwt/jwt.service';
 import { Response, NextFunction } from 'express';
+import { configService } from '../../config/config.service';
 import { IAuthRequest } from '../../infrastructure/types/request.types';
 
 /**
@@ -46,7 +46,7 @@ export const authenticate = (
   // Verify JWT token
   const decoded = jwtService.verifyJWT({
     token,
-    secret: authConfig.JWT_SECRET!,
+    secret: configService.get('JWT_SECRET'),
   });
 
   // Check if token is valid and not expired

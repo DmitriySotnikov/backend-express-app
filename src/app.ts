@@ -19,12 +19,13 @@
 import 'dotenv/config';
 import cors from 'cors';
 import { createServer } from 'http';
+import { corsOptions } from './config';
 import cookieParser from 'cookie-parser';
 import swaggerJsdoc from 'swagger-jsdoc';
 import express, { Express } from 'express';
 import swaggerUi from 'swagger-ui-express';
-import { config, corsOptions } from './config';
 import logger from './infrastructure/logger/logger';
+import { configService } from './config/config.service';
 // @ts-ignore
 import { container } from './infrastructure/di/container';
 import AppDataSource from './infrastructure/orm/typeorm/data-source';
@@ -36,6 +37,7 @@ import AuthUserController from './presentation/controllers/auth.controller';
 import { errorHandler } from './infrastructure/middlewares/error.middleware';
 import { httpLogger } from './infrastructure/middlewares/http-logger.middleware';
 import { notFoundHandler } from './infrastructure/middlewares/not-found-handler.middleware';
+
 
 /**
  * Create the main Express application instance.
@@ -114,8 +116,9 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  * configurable API prefix, enabling versioning
  * and namespace separation.
  */
-app.use(`/${config.PREFIX}/auth`, authRouter);
-app.use(`/${config.PREFIX}/users`, userRouter);
+const apiPrefix = configService.get('API_PREFIX');
+app.use(`/${apiPrefix}/auth`, authRouter);
+app.use(`/${apiPrefix}/users`, userRouter);
 
 /**
  * Configure final error handling middleware.
@@ -135,7 +138,7 @@ app.use(errorHandler);
  * Creates and starts the HTTP server, listening
  * on the configured port and logging the startup.
  */
-const port = config.PORT;
+const port = configService.get('PORT');
 const httpServer = createServer(app);
 httpServer.listen(port, () => logger.info(`Server started on port ${port}`));
 
